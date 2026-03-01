@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Repositório da Mariela</title>
+    <style>
+        /* CSS INTERNO */
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; flex-direction: column; height: 100vh; background: #1e1e1e; color: white; }
+        header { padding: 10px 20px; background: #252526; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+        .controls { display: flex; gap: 10px; align-items: center; }
+        input, select, button { padding: 8px; border-radius: 4px; border: 1px solid #444; background: #333; color: white; outline: none; }
+        button { cursor: pointer; background: #007acc; border: none; font-weight: bold; }
+        button:hover { background: #005f99; }
+        .main-container { display: flex; flex: 1; gap: 5px; padding: 10px; overflow: hidden; }
+        textarea { flex: 1; background: #2d2d2d; color: #d4d4d4; border: 1px solid #444; padding: 15px; font-family: 'Consolas', monospace; font-size: 14px; resize: none; border-radius: 4px; }
+        iframe { flex: 1; background: white; border: 1px solid #444; border-radius: 4px; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div><strong>Mariela Drive</strong></div>
+        <div class="controls">
+            <input type="text" id="nomeProjeto" placeholder="Nome do arquivo...">
+            <button onclick="guardarProjeto()">Guardar</button>
+            <select id="listaProjetos" onchange="carregarProjeto()">
+                <option value="">Meus Arquivos...</option>
+            </select>
+            <button onclick="novoProjeto()" style="background: #444;">Novo</button>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <textarea id="codigoInput" placeholder="Escreve ou cola o teu HTML aqui..."></textarea>
+        <iframe id="preview"></iframe>
+    </div>
+
+    <script>
+        /* SCRIPT INTERNO */
+        const textarea = document.getElementById('codigoInput');
+        const iframe = document.getElementById('preview');
+        const inputNome = document.getElementById('nomeProjeto');
+        const selectProjetos = document.getElementById('listaProjetos');
+
+        // Atualiza o preview em tempo real
+        textarea.addEventListener('input', () => {
+            const doc = iframe.contentDocument || iframe.contentWindow.document;
+            doc.open();
+            doc.write(textarea.value);
+            doc.close();
+        });
+
+        // Guarda o código no localStorage
+        function guardarProjeto() {
+            const nome = inputNome.value.trim();
+            const codigo = textarea.value;
+
+            if (!nome) {
+                alert("Dá um nome ao teu arquivo primeiro!");
+                return;
+            }
+
+            localStorage.setItem('mariela_' + nome, codigo);
+            alert("Projeto '" + nome + "' guardado com sucesso!");
+            atualizarLista();
+        }
+
+        // Carrega a lista de projetos guardados
+        function atualizarLista() {
+            selectProjetos.innerHTML = '<option value="">Meus Arquivos...</option>';
+            for (let i = 0; i < localStorage.length; i++) {
+                const chave = localStorage.key(i);
+                if (chave.startsWith('mariela_')) {
+                    const nomeReal = chave.replace('mariela_', '');
+                    const option = document.createElement('option');
+                    option.value = chave;
+                    option.textContent = nomeReal;
+                    selectProjetos.appendChild(option);
+                }
+            }
+        }
+
+        // Carrega um projeto selecionado
+        function carregarProjeto() {
+            const chave = selectProjetos.value;
+            if (chave) {
+                const codigo = localStorage.getItem(chave);
+                textarea.value = codigo;
+                inputNome.value = chave.replace('mariela_', '');
+                textarea.dispatchEvent(new Event('input'));
+            }
+        }
+
+        function novoProjeto() {
+            textarea.value = '';
+            inputNome.value = '';
+            textarea.dispatchEvent(new Event('input'));
+        }
+
+        // Inicializa a lista ao abrir
+        atualizarLista();
+    </script>
+</body>
+</html>
