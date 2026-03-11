@@ -1,0 +1,19 @@
+inicio
+   inteiro idade
+   escreva("Digite um número: ")
+   leia(idade)
+   
+   escolha (idade)
+      caso 5:
+      caso 6:
+      caso 7:
+      caso 8:
+      caso 9:
+      caso 10:
+         escreva("Infantil")
+         pare
+      padrao:
+         escreva("Fora da faixa infantil")
+         pare
+   fimescolha
+fim
